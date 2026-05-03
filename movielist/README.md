@@ -1,70 +1,83 @@
-# Getting Started with Create React App
+# CS628 Full-Stack Development - Web
+**Term:** Spring 2026 | **Author:** David Hiltzman | **Assignment:** PE02 – Movie List
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+The input-process-output (IPO) model is a widely used approach in systems analysis and software engineering for describing the structure of an information processing program or another process. Many introductory programming and systems analysis texts introduce this as the most basic structure for describing a process.
 
-### `npm start`
+## Discussion
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+A computer program or any other sort of process using the input-process-output model receives inputs from a user or other source, does some computations on the inputs, and returns the results of the computations. The system divides the work into three categories:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- A requirement from the environment (input)
+- A computation based on the requirement (process)
+- A provision for the environment (output)
 
-### `npm test`
+### Example: Movie List App
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This React application renders a filterable list of movies. Each movie entry displays a title, release year, and genre. The user can select a genre from a dropdown to narrow the displayed results, and clicking any movie card triggers an alert showing the movie title.
 
-### `npm run build`
+Following the IPO model, the program must:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Input:** Accept a genre selection from the user via a dropdown control.
+2. **Process:** Filter the internal movies array to return only entries whose genre matches the selected value (or return all entries when "All Genres" is selected).
+3. **Output:** Render the filtered list of movie cards to the screen; display an alert with the movie title when a card is clicked.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Pseudocode
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+Function Main
+    // Renders a filterable movie list; alerts title on card click
+    Declare Array movies = [ { title, genre, releaseYear }, ... ]
+    Declare String selectedGenre = "All Genres"
+    Declare Array filtered
 
-### `npm run eject`
+    Output genre dropdown populated with unique genres from movies
+    Input selectedGenre (from dropdown onChange event)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    If selectedGenre equals "All Genres" Then
+        Assign filtered = movies
+    Else
+        Assign filtered = movies WHERE movie.genre equals selectedGenre
+    End If
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    Output filtered movie cards (title, genre, releaseYear)
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+    On card click:
+        Input clickedMovie.title
+        Output alert(clickedMovie.title)
+End
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Output
 
-## Learn More
+```
+// Initial render - All Genres selected
+CINEMAVAULT
+Your curated film collection
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Filter by Genre: [ All Genres v ]
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2010  Inception          Sci-Fi    →
+2008  The Dark Knight    Action    →
+2014  Interstellar       Sci-Fi    →
+2019  Parasite           Thriller  →
+1972  The Godfather      Drama     →
+1994  Pulp Fiction       Thriller  →
+2017  Get Out            Horror    →
+2015  Mad Max: Fury Road Action    →
+2016  Arrival            Sci-Fi    →
+2014  Whiplash           Drama     →
+                              10 films
 
-### Code Splitting
+// After selecting "Sci-Fi"
+2010  Inception     Sci-Fi  →
+2014  Interstellar  Sci-Fi  →
+2016  Arrival       Sci-Fi  →
+                       3 films
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+// On card click (e.g., Inception)
+Alert: "Inception"
+```
