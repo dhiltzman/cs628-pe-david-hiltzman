@@ -1,70 +1,84 @@
-# Getting Started with Create React App
+# CS628 Full-Stack Development - Web
+# Term: Spring 2026
+# Author: David Hiltzman
+# Assignment: PE03
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
 
-## Available Scripts
+The input-process-output (IPO) model is a widely used approach in systems analysis and software engineering for describing the structure of an information processing program or another process. Many introductory programming and systems analysis texts introduce this as the most basic structure for describing a process.
 
-In the project directory, you can run:
+## Discussion
 
-### `npm start`
+A computer program or any other sort of process using the input-process-output model receives inputs from a user or other source, does some computations on the inputs, and returns the results of the computations. The system divides the work into three categories:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- A requirement from the environment (input)
+- A computation based on the requirement (process)
+- A provision for the environment (output)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Example: React ToDo List App
 
-### `npm test`
+This application is a task management tool built with React. Users can add tasks to a list, mark them as complete by toggling a checkbox, and remove them using a delete button. State is managed entirely with the `useState` hook, and the UI updates reactively with every interaction.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+The app is split into three components:
+- `App.js` - holds all state and event handlers, renders the input row and stats line
+- `todolist.js` - receives the todos array as props and maps over it to render each item
+- `todoitem.js` - renders a single task with a checkbox, text, and delete button
 
-### `npm run build`
+Following the IPO model, the program must:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Input** - The user types a task description into the text input field and clicks "Add Task" (or presses Enter)
+2. **Process** - The `addTodo` function reads the input, creates a new todo object with a unique `id` via `Date.now()`, and updates the `todos` state array using `setTodos`; `toggleTodo` flips a task's `done` boolean; `deleteTodo` filters the task out of state
+3. **Output** - The updated `todos` array is passed to `TodoList`, which re-renders the list with the new or modified task reflected in the UI, including a live completed/total stats counter
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Pseudocode
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+Component App
+    Declare todos = [] (state)
+    Declare input = "" (state)
 
-### `npm run eject`
+    Function addTodo
+        If input is not empty
+            Append { id: timestamp, text: input, done: false } to todos
+            Reset input to ""
+        End If
+    End Function
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    Function deleteTodo(id)
+        Assign todos = todos filtered where todo.id !== id
+    End Function
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+    Function toggleTodo(id)
+        Assign todos = todos mapped where matching todo.done is flipped
+    End Function
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+    Output input field, Add Task button
+    Output stats line (completedCount of todos.length completed)
+    Output TodoList passing todos, onDelete, onToggle
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Component TodoList (todos, onDelete, onToggle)
+    If todos is empty
+        Output "No tasks yet" message
+    Else
+        For each todo in todos
+            Output TodoItem passing todo, onDelete, onToggle
+        End For
+    End If
 
-## Learn More
+Component TodoItem (todo, onDelete, onToggle)
+    Output checkbox (checked = todo.done, onChange calls onToggle)
+    Output todo.text (strikethrough if done)
+    Output Delete button (onClick calls onDelete)
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Output
 
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+- Empty state: "No tasks yet. Add one above!" message is shown
+- After adding tasks:
+    [ ] Buy groceries
+    [x] Review React useState hook    <- strikethrough, checkbox checked
+    [ ] Submit assignment
+    1 of 3 completed
+- After clicking Delete on a task, it is removed from the list immediately
+```
