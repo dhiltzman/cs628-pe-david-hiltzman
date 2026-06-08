@@ -1,4 +1,4 @@
-const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const BASE_URL = process.env.REACT_APP_API_URL || 'https://refactored-space-giggle-9wx659p66pxhp7qx-5050.app.github.dev';
 
 async function handleResponse(res) {
   if (!res.ok) {
@@ -24,7 +24,7 @@ export const api = {
 
   updateRecipe: (id, data) =>
     fetch(`${BASE_URL}/recipes/${id}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     }).then(handleResponse),

@@ -6,15 +6,12 @@ export default function RecipeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { refreshList } = useOutletContext();
-
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    setError('');
     api.getRecipe(id)
       .then(setRecipe)
       .catch(() => setError('Recipe not found.'))
@@ -22,32 +19,18 @@ export default function RecipeDetail() {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!window.confirm(`Delete "${recipe.name}"? This cannot be undone.`)) return;
-    setDeleting(true);
+    if (!window.confirm(`Delete "${recipe.name}"?`)) return;
     try {
       await api.deleteRecipe(id);
       refreshList();
       navigate('/');
     } catch {
-      setError('Failed to delete recipe.');
-      setDeleting(false);
+      setError('Failed to delete.');
     }
   };
 
-  if (loading) return (
-    <div className="state-container">
-      <div className="spinner" />
-      <span>Loading recipe...</span>
-    </div>
-  );
-
-  if (error) return (
-    <div className="state-container">
-      <div className="error-msg">{error}</div>
-      <Link to="/" className="btn btn-secondary">Back to list</Link>
-    </div>
-  );
-
+  if (loading) return <div className="spinner" />;
+  if (error) return <div className="error">{error}</div>;
   if (!recipe) return null;
 
   const ingredients = Array.isArray(recipe.ingredients)
@@ -55,80 +38,44 @@ export default function RecipeDetail() {
     : (recipe.ingredients || '').split('\n').filter(Boolean);
 
   return (
-    <div className="recipe-detail-card">
-      {recipe.category && (
-        <span className="detail-category-tag">{recipe.category}</span>
-      )}
-
+    <div>
+      {recipe.category && <small style={{ color: 'var(--muted)' }}>{recipe.category}</small>}
       <h1 className="detail-title">{recipe.name}</h1>
+      {recipe.description && <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>{recipe.description}</p>}
 
-      {recipe.description && (
-        <p className="detail-subtitle">{recipe.description}</p>
-      )}
-
-      <div className="detail-meta-row">
-        {recipe.prepTime && (
-          <div className="meta-item">
-            <span className="meta-label">Prep time</span>
-            <span className="meta-value">{recipe.prepTime}</span>
-          </div>
-        )}
-        {recipe.cookTime && (
-          <div className="meta-item">
-            <span className="meta-label">Cook time</span>
-            <span className="meta-value">{recipe.cookTime}</span>
-          </div>
-        )}
-        {recipe.servings && (
-          <div className="meta-item">
-            <span className="meta-label">Servings</span>
-            <span className="meta-value">{recipe.servings}</span>
-          </div>
-        )}
-        {recipe.difficulty && (
-          <div className="meta-item">
-            <span className="meta-label">Difficulty</span>
-            <span className="meta-value">{recipe.difficulty}</span>
-          </div>
-        )}
+      <div className="meta">
+        {recipe.prepTime && <span>Prep: {recipe.prepTime}</span>}
+        {recipe.cookTime && <span>Cook: {recipe.cookTime}</span>}
+        {recipe.servings && <span>Serves: {recipe.servings}</span>}
+        {recipe.difficulty && <span>{recipe.difficulty}</span>}
       </div>
 
       {ingredients.length > 0 && (
-        <div className="detail-section">
+        <div className="section">
           <h3>Ingredients</h3>
-          <ul className="ingredient-list">
-            {ingredients.map((ing, i) => (
-              <li key={i}>{ing}</li>
-            ))}
+          <ul className="ingredients">
+            {ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
           </ul>
         </div>
       )}
 
       {recipe.instructions && (
-        <div className="detail-section">
+        <div className="section">
           <h3>Instructions</h3>
-          <p className="instructions-text">{recipe.instructions}</p>
+          <p className="instructions">{recipe.instructions}</p>
         </div>
       )}
 
       {recipe.notes && (
-        <div className="detail-section">
+        <div className="section">
           <h3>Notes</h3>
-          <p className="instructions-text">{recipe.notes}</p>
+          <p className="instructions">{recipe.notes}</p>
         </div>
       )}
 
-      <div className="detail-actions">
-        <Link to={`/edit/${recipe._id}`} className="btn btn-primary">
-          ✏ Edit Recipe
-        </Link>
-        <button
-          className="btn btn-danger"
-          onClick={handleDelete}
-          disabled={deleting}
-        >
-          {deleting ? 'Deleting...' : '✕ Delete'}
-        </button>
+      <div className="actions">
+        <Link to={`/edit/${recipe._id}`} className="btn btn-primary">Edit</Link>
+        <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
       </div>
     </div>
   );

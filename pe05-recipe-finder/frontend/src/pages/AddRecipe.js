@@ -10,22 +10,18 @@ export default function AddRecipe() {
 
   const handleSubmit = async (data) => {
     setSubmitting(true);
-    setError('');
     try {
       const created = await api.createRecipe(data);
       navigate(`/recipe/${created._id}`);
     } catch (err) {
-      setError(err.message || 'Failed to save recipe.');
+      setError(err.message || 'Failed to save.');
       setSubmitting(false);
     }
   };
 
   return (
     <div className="form-page">
-      <div className="form-page-header">
-        <h1>Add a Recipe</h1>
-        <p>Share a new dish with your collection.</p>
-      </div>
+      <h1>Add Recipe</h1>
       <RecipeForm onSubmit={handleSubmit} submitting={submitting} error={error} />
     </div>
   );

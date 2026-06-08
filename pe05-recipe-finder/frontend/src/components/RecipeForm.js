@@ -15,7 +15,6 @@ export default function RecipeForm({ initialData = {}, onSubmit, submitting, err
     instructions: initialData.instructions || '',
     notes: initialData.notes || '',
   });
-
   const [ingredients, setIngredients] = useState(
     Array.isArray(initialData.ingredients)
       ? initialData.ingredients
@@ -23,9 +22,9 @@ export default function RecipeForm({ initialData = {}, onSubmit, submitting, err
   );
   const [ingInput, setIngInput] = useState('');
 
-  const set = (field) => (e) => setForm(f => ({ ...f, [field]: e.target.value }));
+  const set = field => e => setForm(f => ({ ...f, [field]: e.target.value }));
 
-  const addIngredient = () => {
+  const addIng = () => {
     const val = ingInput.trim();
     if (val && !ingredients.includes(val)) {
       setIngredients(prev => [...prev, val]);
@@ -33,97 +32,70 @@ export default function RecipeForm({ initialData = {}, onSubmit, submitting, err
     }
   };
 
-  const removeIngredient = (idx) =>
-    setIngredients(prev => prev.filter((_, i) => i !== idx));
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); addIngredient(); }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ ...form, ingredients });
-  };
-
   return (
-    <form className="recipe-form" onSubmit={handleSubmit}>
-      {error && <div className="error-msg">{error}</div>}
+    <form className="recipe-form" onSubmit={e => { e.preventDefault(); onSubmit({ ...form, ingredients }); }}>
+      {error && <div className="error">{error}</div>}
 
       <div className="form-group">
-        <label htmlFor="name">Recipe Name *</label>
-        <input
-          id="name"
-          type="text"
-          placeholder="e.g. Grandma's Tomato Soup"
-          value={form.name}
-          onChange={set('name')}
-          required
-        />
+        <label>Name *</label>
+        <input value={form.name} onChange={set('name')} required placeholder="Recipe name" />
       </div>
 
       <div className="form-group">
-        <label htmlFor="description">Short Description</label>
-        <input
-          id="description"
-          type="text"
-          placeholder="A brief overview of the dish"
-          value={form.description}
-          onChange={set('description')}
-        />
+        <label>Description</label>
+        <input value={form.description} onChange={set('description')} placeholder="Short description" />
       </div>
 
       <div className="form-row">
         <div className="form-group">
-          <label htmlFor="category">Category</label>
-          <select id="category" value={form.category} onChange={set('category')}>
-            <option value="">Select category</option>
-            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          <label>Category</label>
+          <select value={form.category} onChange={set('category')}>
+            <option value="">Select...</option>
+            {CATEGORIES.map(c => <option key={c}>{c}</option>)}
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="difficulty">Difficulty</label>
-          <select id="difficulty" value={form.difficulty} onChange={set('difficulty')}>
-            <option value="">Select difficulty</option>
-            {DIFFICULTIES.map(d => <option key={d} value={d}>{d}</option>)}
+          <label>Difficulty</label>
+          <select value={form.difficulty} onChange={set('difficulty')}>
+            <option value="">Select...</option>
+            {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
           </select>
         </div>
       </div>
 
       <div className="form-row">
         <div className="form-group">
-          <label htmlFor="prepTime">Prep Time</label>
-          <input id="prepTime" type="text" placeholder="e.g. 15 mins" value={form.prepTime} onChange={set('prepTime')} />
+          <label>Prep Time</label>
+          <input value={form.prepTime} onChange={set('prepTime')} placeholder="e.g. 15 mins" />
         </div>
         <div className="form-group">
-          <label htmlFor="cookTime">Cook Time</label>
-          <input id="cookTime" type="text" placeholder="e.g. 30 mins" value={form.cookTime} onChange={set('cookTime')} />
+          <label>Cook Time</label>
+          <input value={form.cookTime} onChange={set('cookTime')} placeholder="e.g. 30 mins" />
         </div>
       </div>
 
-      <div className="form-group" style={{ maxWidth: 220 }}>
-        <label htmlFor="servings">Servings</label>
-        <input id="servings" type="text" placeholder="e.g. 4" value={form.servings} onChange={set('servings')} />
+      <div className="form-group" style={{ maxWidth: 180 }}>
+        <label>Servings</label>
+        <input value={form.servings} onChange={set('servings')} placeholder="e.g. 4" />
       </div>
 
-      {/* Ingredients */}
       <div className="form-group">
         <label>Ingredients</label>
-        <div className="ingredient-input-row">
+        <div className="ing-row">
           <input
-            type="text"
-            placeholder="Add ingredient and press Enter"
             value={ingInput}
             onChange={e => setIngInput(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addIng(); } }}
+            placeholder="Add ingredient, press Enter"
           />
-          <button type="button" className="btn btn-secondary" onClick={addIngredient}>Add</button>
+          <button type="button" className="btn btn-secondary" onClick={addIng}>Add</button>
         </div>
         {ingredients.length > 0 && (
-          <div className="ingredients-tags">
+          <div className="tags">
             {ingredients.map((ing, i) => (
-              <span key={i} className="ingredient-tag">
+              <span key={i} className="tag">
                 {ing}
-                <button type="button" onClick={() => removeIngredient(i)} aria-label="Remove">✕</button>
+                <button type="button" onClick={() => setIngredients(p => p.filter((_, j) => j !== i))}>x</button>
               </span>
             ))}
           </div>
@@ -131,32 +103,20 @@ export default function RecipeForm({ initialData = {}, onSubmit, submitting, err
       </div>
 
       <div className="form-group">
-        <label htmlFor="instructions">Instructions *</label>
-        <textarea
-          id="instructions"
-          placeholder="Step-by-step cooking instructions..."
-          value={form.instructions}
-          onChange={set('instructions')}
-          style={{ minHeight: 180 }}
-          required
-        />
+        <label>Instructions *</label>
+        <textarea value={form.instructions} onChange={set('instructions')} required style={{ minHeight: 160 }} />
       </div>
 
       <div className="form-group">
-        <label htmlFor="notes">Notes / Tips</label>
-        <textarea
-          id="notes"
-          placeholder="Optional tips, substitutions, storage instructions..."
-          value={form.notes}
-          onChange={set('notes')}
-        />
+        <label>Notes</label>
+        <textarea value={form.notes} onChange={set('notes')} />
       </div>
 
       <div className="form-actions">
         <button type="submit" className="btn btn-primary" disabled={submitting}>
-          {submitting ? 'Saving...' : 'Save Recipe'}
+          {submitting ? 'Saving...' : 'Save'}
         </button>
-        <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>
+        <button type="button" className="btn btn-secondary" onClick={() => window.history.back()}>
           Cancel
         </button>
       </div>

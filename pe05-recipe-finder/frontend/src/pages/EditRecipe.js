@@ -7,51 +7,31 @@ export default function EditRecipe() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    api.getRecipe(id)
-      .then(setRecipe)
-      .catch(() => setError('Could not load recipe.'))
-      .finally(() => setLoading(false));
+    api.getRecipe(id).then(setRecipe).catch(() => setError('Could not load recipe.'));
   }, [id]);
 
   const handleSubmit = async (data) => {
     setSubmitting(true);
-    setError('');
     try {
       await api.updateRecipe(id, data);
       navigate(`/recipe/${id}`);
     } catch (err) {
-      setError(err.message || 'Failed to update recipe.');
+      setError(err.message || 'Failed to update.');
       setSubmitting(false);
     }
   };
 
-  if (loading) return (
-    <div className="state-container" style={{ minHeight: '50vh' }}>
-      <div className="spinner" />
-      <span>Loading recipe...</span>
-    </div>
-  );
+  if (!recipe && !error) return <div className="spinner" />;
 
   return (
     <div className="form-page">
-      <div className="form-page-header">
-        <h1>Edit Recipe</h1>
-        <p>Update the details for <em>{recipe?.name}</em>.</p>
-      </div>
-      {recipe && (
-        <RecipeForm
-          initialData={recipe}
-          onSubmit={handleSubmit}
-          submitting={submitting}
-          error={error}
-        />
-      )}
-      {!recipe && error && <div className="error-msg">{error}</div>}
+      <h1>Edit Recipe</h1>
+      {recipe && <RecipeForm initialData={recipe} onSubmit={handleSubmit} submitting={submitting} error={error} />}
+      {!recipe && error && <div className="error">{error}</div>}
     </div>
   );
 }

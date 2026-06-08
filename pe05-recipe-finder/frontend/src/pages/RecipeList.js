@@ -12,7 +12,7 @@ export default function RecipeList() {
   useEffect(() => {
     api.getRecipes()
       .then(setRecipes)
-      .catch(() => setError('Could not load recipes. Is the server running?'))
+      .catch(() => setError('Could not load recipes.'))
       .finally(() => setLoading(false));
   }, []);
 
@@ -21,70 +21,39 @@ export default function RecipeList() {
     (r.category || '').toLowerCase().includes(search.toLowerCase())
   );
 
-  return (
-    <div className="recipe-list-layout">
-      {/* ── Left panel ── */}
-      <aside className="list-panel">
-        <div className="list-panel-header">
-          <h1>Recipes</h1>
-          <p>{recipes.length} recipe{recipes.length !== 1 ? 's' : ''} collected</p>
-        </div>
+  const refreshList = () => api.getRecipes().then(setRecipes).catch(() => {});
 
-        <div className="search-bar">
+  return (
+    <div className="layout">
+      <aside className="sidebar">
+        <div className="sidebar-header">{recipes.length} recipe{recipes.length !== 1 ? 's' : ''}</div>
+        <div className="search">
           <input
-            type="text"
-            placeholder="Search by name or category..."
+            placeholder="Search..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-
-        <div className="recipe-items">
-          {loading && (
-            <div className="state-container" style={{ minHeight: '20vh' }}>
-              <div className="spinner" />
-            </div>
-          )}
-
-          {error && <div className="error-msg" style={{ margin: '1rem' }}>{error}</div>}
-
-          {!loading && !error && filtered.length === 0 && (
-            <div className="empty-list">
-              <div className="empty-list-icon">🍽</div>
-              <p>{search ? 'No recipes match your search.' : 'No recipes yet. Add one!'}</p>
-            </div>
-          )}
-
-          {filtered.map(recipe => (
-            <Link
-              key={recipe._id}
-              to={`/recipe/${recipe._id}`}
-              className={`recipe-list-item${activeId === recipe._id ? ' active-recipe' : ''}`}
-            >
-              <span className="recipe-list-item-name">{recipe.name}</span>
-              <div className="recipe-list-item-meta">
-                {recipe.category && <span className="tag-pill">{recipe.category}</span>}
-                {recipe.cookTime && <span>{recipe.cookTime}</span>}
-                {recipe.servings && <span>{recipe.servings} servings</span>}
-              </div>
-            </Link>
-          ))}
-        </div>
+        {loading && <div className="spinner" />}
+        {error && <div className="error" style={{ margin: '1rem' }}>{error}</div>}
+        {!loading && filtered.length === 0 && (
+          <div className="empty">{search ? 'No matches.' : 'No recipes yet.'}</div>
+        )}
+        {filtered.map(r => (
+          <Link
+            key={r._id}
+            to={`/recipe/${r._id}`}
+            className={`recipe-item${activeId === r._id ? ' active' : ''}`}
+          >
+            {r.name}
+            <small>{[r.category, r.cookTime].filter(Boolean).join(' · ')}</small>
+          </Link>
+        ))}
       </aside>
 
-      {/* ── Right panel: nested route renders here ── */}
-      <div className="detail-panel">
-        <Outlet context={{ refreshList: () => {
-          api.getRecipes().then(setRecipes).catch(() => {});
-        }}} />
-
-        {!activeId && (
-          <div className="detail-empty">
-            <div className="detail-empty-icon">🥘</div>
-            <h2>Select a recipe</h2>
-            <p>Pick one from the list, or add a new one.</p>
-          </div>
-        )}
+      <div className="panel">
+        <Outlet context={{ refreshList }} />
+        {!activeId && <div className="empty">Select a recipe or add a new one.</div>}
       </div>
     </div>
   );
