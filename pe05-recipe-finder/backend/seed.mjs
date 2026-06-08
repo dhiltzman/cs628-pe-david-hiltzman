@@ -104,7 +104,7 @@ try {
   await client.connect();
   console.log("Connected to MongoDB Atlas.");
 
-  const db = client.db("recipe_finder");
+  const db = client.db("hos08");
   const collection = db.collection("recipes");
 
   const result = await collection.insertMany(recipes);
